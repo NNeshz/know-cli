@@ -10,18 +10,18 @@ from pathlib import Path
 import typer
 from dotenv import load_dotenv
 
-from saber.docs import Chunk, cargar_chunks
-from saber.embeddings import embeber
-from saber.index import cargar_indice, cargar_vectores, guardar_indice
-from saber.rag import responder_pregunta
-from saber.retrieve import LexicalRetriever, Retriever, SemanticRetriever
+from know.docs import Chunk, cargar_chunks
+from know.embeddings import embeber
+from know.index import cargar_indice, cargar_vectores, guardar_indice
+from know.rag import responder_pregunta
+from know.retrieve import LexicalRetriever, Retriever, SemanticRetriever
 
 # Carga las variables del archivo .env (p. ej. GEMINI_API_KEY) al entorno, si
 # existe. Así no dependemos de hacer `export` en cada terminal.
 load_dotenv()
 
 # `app` es la aplicación de línea de comandos. Cada función decorada con
-# `@app.command()` se vuelve un subcomando (saber indexar / preguntar / buscar).
+# `@app.command()` se vuelve un subcomando (know indexar / preguntar / buscar).
 app = typer.Typer(help="Búsqueda de conocimiento sobre documentos con IA.")
 
 ERRORES_ESPERADOS = (FileNotFoundError, NotADirectoryError, RuntimeError)
@@ -42,7 +42,7 @@ def _construir_retriever(modo: str, chunks: list[Chunk], indice: Path) -> Retrie
         if vectores is None:
             raise RuntimeError(
                 "El índice no tiene embeddings. Reindexá con: "
-                f"saber indexar <carpeta> --indice {indice} --modo semantico"
+                f"know indexar <carpeta> --indice {indice} --modo semantico"
             )
         return SemanticRetriever.desde_vectores(chunks, vectores)
     raise typer.BadParameter(
@@ -51,7 +51,7 @@ def _construir_retriever(modo: str, chunks: list[Chunk], indice: Path) -> Retrie
 
 
 @app.command()
-def indexar(carpeta: str, indice: str = ".saber", modo: str = "lexical") -> None:
+def indexar(carpeta: str, indice: str = ".know", modo: str = "lexical") -> None:
     """Lee los documentos de CARPETA, los parte en chunks y guarda el índice."""
     try:
         chunks = cargar_chunks(Path(carpeta))
@@ -72,7 +72,7 @@ def indexar(carpeta: str, indice: str = ".saber", modo: str = "lexical") -> None
 
 @app.command()
 def preguntar(
-    pregunta: str, k: int = 5, indice: str = ".saber", modo: str = "lexical"
+    pregunta: str, k: int = 5, indice: str = ".know", modo: str = "lexical"
 ) -> None:
     """Responde PREGUNTA en lenguaje natural citando las fuentes (usa IA)."""
     try:
@@ -93,7 +93,7 @@ def preguntar(
 
 @app.command()
 def buscar(
-    consulta: str, k: int = 5, indice: str = ".saber", modo: str = "lexical"
+    consulta: str, k: int = 5, indice: str = ".know", modo: str = "lexical"
 ) -> None:
     """Muestra los fragmentos más relevantes para CONSULTA (sin generar respuesta)."""
     try:

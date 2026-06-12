@@ -2,8 +2,8 @@
 
 import pytest
 
-from saber.docs import Chunk
-from saber.retrieve import LexicalRetriever, coseno, tokenizar
+from know.docs import Chunk
+from know.retrieve import LexicalRetriever, coseno, tokenizar
 
 
 @pytest.mark.parametrize(

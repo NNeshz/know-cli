@@ -14,8 +14,8 @@ from typing import Protocol
 
 import numpy as np
 
-from saber.docs import Chunk
-from saber.embeddings import embeber
+from know.docs import Chunk
+from know.embeddings import embeber
 
 # Una "palabra" es una secuencia de caracteres alfanuméricos. En Python 3 `\w`
 # ya incluye letras acentuadas y la ñ, así que "etiqueta" y "mecánica" tokenizan bien.

@@ -11,8 +11,8 @@ Uso:  uv run python evals.py
 
 from pathlib import Path
 
-from saber.docs import cargar_chunks
-from saber.retrieve import LexicalRetriever
+from know.docs import cargar_chunks
+from know.retrieve import LexicalRetriever
 
 CARPETA_DOCS = Path("tests/data/docs")
 

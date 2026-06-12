@@ -6,9 +6,9 @@ pasos. Por eso recibe el `Retriever` como parámetro (inyección de dependencias
 mañana podés pasarle el léxico o el semántico sin tocar esta función.
 """
 
-from saber.docs import Chunk
-from saber.llm import responder
-from saber.retrieve import Retriever
+from know.docs import Chunk
+from know.llm import responder
+from know.retrieve import Retriever
 
 
 def responder_pregunta(

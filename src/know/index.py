@@ -9,7 +9,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from saber.docs import Chunk
+from know.docs import Chunk
 
 NOMBRE_ARCHIVO = "chunks.json"
 NOMBRE_VECTORES = "vectores.json"  # solo existe en índices del modo semántico
@@ -42,7 +42,7 @@ def cargar_indice(carpeta: Path) -> list[Chunk]:
     ruta = carpeta / NOMBRE_ARCHIVO
     if not ruta.exists():
         raise FileNotFoundError(
-            f"No encontré un índice en {ruta}. ¿Corriste 'saber indexar' antes?"
+            f"No encontré un índice en {ruta}. ¿Corriste 'know indexar' antes?"
         )
     with ruta.open(encoding="utf-8") as archivo:
         datos = json.load(archivo)

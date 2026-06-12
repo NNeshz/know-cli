@@ -3,7 +3,7 @@
 # y qué comando de terminal expone. Es el estándar moderno de Python (PEP 621).
 
 [project]
-name = "saber"
+name = "know"
 version = "0.1.0"
 description = "CLI que indexa documentos y responde preguntas citando las fuentes (RAG)."
 readme = "README.md"
@@ -12,16 +12,15 @@ requires-python = ">=3.11"
 # Dependencias de la aplicación (lo que necesita para correr en producción).
 dependencies = [
     "typer>=0.12",        # construir el CLI (comandos, flags, --help)
-    "google-genai>=1.0",  # SDK oficial de Google Gemini (generación) — Fase 3
+    "google-genai>=1.0",  # SDK oficial de Google Gemini (generación y embeddings)
     "python-dotenv>=1.0", # leer la API key desde un archivo .env local
-    "voyageai>=0.3",      # SDK de embeddings (modo semántico) — se usa en la Fase 4
-    "numpy>=2.0",         # similitud de coseno — se usa en la Fase 4
+    "numpy>=2.0",         # similitud de coseno (modo semántico)
 ]
 
-# Esto define el comando de terminal `saber`. Al escribir `saber` en la consola,
-# Python importa el objeto `app` del módulo `saber.cli` y lo ejecuta.
+# Esto define el comando de terminal `know`. Al escribir `know` en la consola,
+# Python importa el objeto `app` del módulo `know.cli` y lo ejecuta.
 [project.scripts]
-saber = "saber.cli:app"
+know = "know.cli:app"
 
 # Dependencias SOLO de desarrollo (no se instalan en producción): pruebas,
 # linter/formateador y chequeo de tipos. Estándar PEP 735 que uv entiende.
@@ -43,11 +42,11 @@ python_version = "3.11"
 strict = true             # chequeo de tipos estricto: nos obliga a tipar bien
 
 # --- Cómo se construye/instala el paquete ---
-# Usamos hatchling. Como el código vive en src/saber, se lo indicamos.
+# Usamos hatchling. Como el código vive en src/know, se lo indicamos.
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/saber"]
+packages = ["src/know"]

@@ -3,7 +3,7 @@ PLAN.md
 
 .env
 .venv
-.saber/
+.know/
 __pycache__
 *.pyc
 *.pyo

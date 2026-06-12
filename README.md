@@ -1,4 +1,4 @@
-# saber
+# know
 
 CLI en Python que indexa una carpeta de documentos y responde preguntas en
 **lenguaje natural** sobre ellos, citando las fuentes. Es un RAG
@@ -51,8 +51,8 @@ funciona sin ninguna key.
 GEMINI_API_KEY=AIza...
 
 # Opcionales (tienen default en el código):
-SABER_MODEL=gemini-2.5-flash             # modelo de generación
-SABER_EMBEDDINGS_MODEL=gemini-embedding-001  # modelo de embeddings
+KNOW_MODEL=gemini-2.5-flash             # modelo de generación
+KNOW_EMBEDDINGS_MODEL=gemini-embedding-001  # modelo de embeddings
 ```
 
 > **Nunca** pongas la key en el código ni la subas al repo. Usá una variable de
@@ -65,17 +65,17 @@ SABER_EMBEDDINGS_MODEL=gemini-embedding-001  # modelo de embeddings
 uv sync
 
 # 1) Indexar una carpeta de documentos (modo léxico, sin costo)
-uv run saber indexar ./tests/data/docs
+uv run know indexar ./tests/data/docs
 
 # 2) Preguntar en lenguaje natural (genera con Gemini; cita las fuentes)
-uv run saber preguntar "¿cada cuánto se cambia el rollo de etiqueta?"
+uv run know preguntar "¿cada cuánto se cambia el rollo de etiqueta?"
 
 # 3) (Depuración) ver qué fragmentos recupera, sin generar respuesta
-uv run saber buscar "etiqueta" --k 5
+uv run know buscar "etiqueta" --k 5
 
 # Modo semántico (calcula embeddings; requiere GEMINI_API_KEY)
-uv run saber indexar ./tests/data/docs --modo semantico
-uv run saber preguntar "¿con qué frecuencia se reemplaza la bobina?" --modo semantico
+uv run know indexar ./tests/data/docs --modo semantico
+uv run know preguntar "¿con qué frecuencia se reemplaza la bobina?" --modo semantico
 ```
 
 ## Subcomandos y flags
@@ -90,7 +90,7 @@ uv run saber preguntar "¿con qué frecuencia se reemplaza la bobina?" --modo se
 | ----------- | ----------- | --------------------------------------------- |
 | `--modo`    | `lexical`   | `lexical` o `semantico`.                      |
 | `--k`       | `5`         | Cuántos fragmentos recuperar como contexto.   |
-| `--indice`  | `.saber`    | Dónde se guarda/lee el índice.                |
+| `--indice`  | `.know`    | Dónde se guarda/lee el índice.                |
 
 ## Tests y evaluación
 
@@ -105,11 +105,11 @@ rápido y gratis. `evals.py` usa el modo léxico para correr offline.
 ## Estructura
 
 ```
-saber/
-├── pyproject.toml          # metadatos, dependencias y el comando "saber"
+know/
+├── pyproject.toml          # metadatos, dependencias y el comando "know"
 ├── evals.py                # eval de recuperación (hit rate)
-├── src/saber/
-│   ├── __main__.py         # punto de entrada (python -m saber)
+├── src/know/
+│   ├── __main__.py         # punto de entrada (python -m know)
 │   ├── cli.py              # comandos (typer) + flag --modo
 │   ├── docs.py             # cargar documentos y partir en chunks
 │   ├── index.py            # guardar/cargar el índice (chunks y vectores)
@@ -126,7 +126,7 @@ La pieza central es el `Protocol` `Retriever`:
 
 ```python
 from typing import Protocol
-from saber.docs import Chunk
+from know.docs import Chunk
 
 class Retriever(Protocol):
     def indexar(self, chunks: list[Chunk]) -> None: ...

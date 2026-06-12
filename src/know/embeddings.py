@@ -12,8 +12,8 @@ from google import genai
 from google.genai import types
 
 # Modelo de embeddings (gratuito en el free tier de Gemini). Se puede
-# sobreescribir con la variable de entorno SABER_EMBEDDINGS_MODEL.
-MODELO_EMBEDDINGS = os.environ.get("SABER_EMBEDDINGS_MODEL", "gemini-embedding-001")
+# sobreescribir con la variable de entorno KNOW_EMBEDDINGS_MODEL.
+MODELO_EMBEDDINGS = os.environ.get("KNOW_EMBEDDINGS_MODEL", "gemini-embedding-001")
 
 # Mapea nuestro 'tipo' simple al task_type que espera la API.
 _TASK_TYPE = {
@@ -48,7 +48,7 @@ def embeber(textos: list[str], tipo: str) -> list[list[float]]:
     try:
         resultado = cliente.models.embed_content(
             model=MODELO_EMBEDDINGS,
-            contents=textos,  # type: ignore[arg-type]
+            contents=textos,
             config=types.EmbedContentConfig(task_type=_TASK_TYPE[tipo]),
         )
     except genai.errors.APIError as err:

@@ -5,8 +5,8 @@ conoce el contrato `Retriever`, le podemos pasar un doble de prueba que lo cumpl
 y reemplazamos `responder` con `monkeypatch`. Así el test es rápido y gratis.
 """
 
-from saber import rag
-from saber.docs import Chunk
+from know import rag
+from know.docs import Chunk
 
 
 class RetrieverFalso:

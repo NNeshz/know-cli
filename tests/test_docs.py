@@ -2,7 +2,7 @@
 
 import pytest
 
-from saber.docs import partir_texto
+from know.docs import partir_texto
 
 
 @pytest.mark.parametrize(

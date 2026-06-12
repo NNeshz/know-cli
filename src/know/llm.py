@@ -14,10 +14,10 @@ import time
 from google import genai
 from google.genai import types
 
-from saber.docs import Chunk
+from know.docs import Chunk
 
 # Modelo por defecto (gratuito en el free tier de Gemini). Se puede sobreescribir
-# con la variable de entorno SABER_MODEL.
+# con la variable de entorno KNOW_MODEL.
 MODELO_POR_DEFECTO = "gemini-2.5-flash"
 
 # Reintentos ante errores transitorios de la API (picos de demanda, rate limits).
@@ -93,7 +93,7 @@ def responder(pregunta: str, contexto: list[Chunk], modelo: str | None = None) -
             "Ponela en un archivo .env o expórtala en tu terminal."
         )
 
-    modelo = modelo or os.environ.get("SABER_MODEL", MODELO_POR_DEFECTO)
+    modelo = modelo or os.environ.get("KNOW_MODEL", MODELO_POR_DEFECTO)
 
     # Cliente con timeout explícito (en milisegundos), como pide el CLAUDE.md.
     cliente = genai.Client(

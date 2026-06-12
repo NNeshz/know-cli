@@ -9,109 +9,117 @@ Harmony: hacer que décadas de documentación operativa (manuales, procedimiento
 especificaciones) sean consultables al instante, en vez de buscar a mano o
 preguntarle al empleado con más experiencia.
 
-> **Por qué Python aquí:** es el ecosistema más maduro para IA. Usamos los SDKs
-> oficiales de Anthropic (`anthropic`) y de Voyage (`voyageai`), `numpy` para la
-> similitud y `typer` para el CLI. (El proyecto hermano `turno` está en Go;
-> usar el lenguaje correcto para cada caso es a propósito.)
+> **Stack:** Python 3.11+, `typer` (CLI), el SDK oficial `google-genai` (Gemini,
+> para generación y embeddings), `numpy` (similitud de coseno) y `python-dotenv`
+> (leer la API key). Entorno y dependencias con `uv`.
 
 ## Cómo funciona (el pipeline RAG)
 
-1. **Indexar:** lee los documentos, los parte en *chunks* (fragmentos), y guarda
-   una representación de cada uno en un índice local.
+```
+documentos → chunks → índice → recuperación → generación → respuesta (+ fuentes)
+```
+
+1. **Indexar:** lee los documentos, los parte en *chunks* (fragmentos con un
+   pequeño solape para no cortar ideas) y guarda un índice local.
 2. **Recuperar:** ante una pregunta, busca los chunks más relevantes.
-3. **Generar:** arma un prompt con esos chunks como contexto y se lo manda a la
-   API de Claude, que responde basándose en ellos y cita de dónde salió.
+3. **Generar:** arma un prompt con esos chunks como contexto y se lo manda a
+   Gemini, que responde **solo** con base en ellos y cita de dónde salió. Si la
+   respuesta no está en el contexto, dice *"No encontré esa información"* en vez
+   de inventar.
 
 La recuperación está detrás de un `Protocol` (interfaz) con dos modos:
 
-- **`lexical`** (por defecto): coincidencia por palabras (TF-IDF), sin APIs
-  externas ni costo. Sirve para tener el pipeline funcionando ya.
-- **`semantico`**: usa *embeddings* para entender el significado, no solo las
-  palabras. Recupera mejor pero requiere una API de embeddings.
-
-> Anthropic no ofrece un modelo de embeddings propio; su proveedor recomendado
-> es **Voyage AI** (modelo sugerido para retrieval: `voyage-3-large`). El modo
-> semántico usa Voyage; el modo léxico no necesita nada.
-
-## Alcance honesto
-
-Esto es un proyecto de aprendizaje, no un sistema de producción. Lo que **sí**
-hace: indexar `.txt` y `.md`, recuperar por palabra o por embeddings, y generar
-respuestas citadas. Lo que **no** hace todavía (y dejas como próximos pasos):
-PDFs, índice persistente en base vectorial, re-ranking, ni evaluación automática
-de calidad. Saber qué falta es parte del mérito.
+- **`lexical`** (por defecto): coincidencia por palabras (TF-IDF), con solo la
+  librería estándar. Sin APIs ni costo: ideal para tener el pipeline andando ya.
+- **`semantico`**: usa *embeddings* de Gemini para buscar por **significado**, no
+  solo por palabras (encuentra "banda" cuando preguntás por "cinta"). Recupera
+  mejor las preguntas con sinónimos.
 
 ## Requisitos
 
 - Python 3.11 o superior.
-- [uv](https://docs.astral.sh/uv/) para manejar el entorno y dependencias
-  (o `pip` + `venv` si prefieres).
-- Una API key de Anthropic en `ANTHROPIC_API_KEY` (para generar respuestas).
-- *Solo para el modo semántico:* una API key de Voyage en `VOYAGE_API_KEY`.
+- [uv](https://docs.astral.sh/uv/) para el entorno y las dependencias.
+- Una API key **gratuita** de Google Gemini en `GEMINI_API_KEY`
+  (obtenela en <https://aistudio.google.com/apikey>, sin tarjeta).
+
+La key hace falta para **generar** respuestas (`preguntar`) y para el **modo
+semántico** (que calcula embeddings). El modo léxico de `buscar`/`indexar`
+funciona sin ninguna key.
 
 ```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-export VOYAGE_API_KEY="pa-..."          # opcional, solo modo semántico
-export CLAUDE_MODEL="claude-sonnet-4-6" # opcional; por defecto un modelo actual
+# En tu terminal, o en un archivo .env en la raíz (ya está en .gitignore):
+GEMINI_API_KEY=AIza...
+
+# Opcionales (tienen default en el código):
+SABER_MODEL=gemini-2.5-flash             # modelo de generación
+SABER_EMBEDDINGS_MODEL=gemini-embedding-001  # modelo de embeddings
 ```
 
-Nunca pongas las keys en el código ni las subas al repo. Para desarrollo local
-puedes usar un archivo `.env` (incluido en `.gitignore`).
+> **Nunca** pongas la key en el código ni la subas al repo. Usá una variable de
+> entorno o el archivo `.env` local.
 
 ## Instalación y uso
 
 ```bash
-# Con uv: crea el entorno e instala dependencias desde pyproject.toml
+# Crea el entorno e instala dependencias desde pyproject.toml
 uv sync
 
-# 1) Indexar una carpeta de documentos
+# 1) Indexar una carpeta de documentos (modo léxico, sin costo)
 uv run saber indexar ./tests/data/docs
 
-# 2) Preguntar en lenguaje natural
-uv run saber preguntar "¿cuál es el procedimiento para cambiar la etiqueta?"
+# 2) Preguntar en lenguaje natural (genera con Gemini; cita las fuentes)
+uv run saber preguntar "¿cada cuánto se cambia el rollo de etiqueta?"
 
 # 3) (Depuración) ver qué fragmentos recupera, sin generar respuesta
 uv run saber buscar "etiqueta" --k 5
 
-# Usar el modo semántico (requiere VOYAGE_API_KEY)
+# Modo semántico (calcula embeddings; requiere GEMINI_API_KEY)
 uv run saber indexar ./tests/data/docs --modo semantico
-uv run saber preguntar "..." --modo semantico
+uv run saber preguntar "¿con qué frecuencia se reemplaza la bobina?" --modo semantico
 ```
-
-Si usas `pip`: `python -m venv .venv && source .venv/bin/activate && pip install -e .`,
-y luego `saber preguntar "..."`.
 
 ## Subcomandos y flags
 
-| Subcomando | Qué hace                                              |
-| ---------- | ----------------------------------------------------- |
-| `indexar`  | Construye el índice a partir de una carpeta.          |
-| `preguntar`| Recupera contexto y genera una respuesta con Claude.  |
-| `buscar`   | Solo recuperación (muestra los chunks); útil para depurar. |
+| Subcomando  | Qué hace                                                   |
+| ----------- | ---------------------------------------------------------- |
+| `indexar`   | Construye y guarda el índice a partir de una carpeta.      |
+| `preguntar` | Recupera contexto y genera una respuesta citada con Gemini.|
+| `buscar`    | Solo recuperación (muestra los chunks); útil para depurar. |
 
 | Flag        | Por defecto | Qué hace                                      |
 | ----------- | ----------- | --------------------------------------------- |
 | `--modo`    | `lexical`   | `lexical` o `semantico`.                      |
 | `--k`       | `5`         | Cuántos fragmentos recuperar como contexto.   |
-| `--indice`  | `.saber/`   | Dónde se guarda/lee el índice.                |
+| `--indice`  | `.saber`    | Dónde se guarda/lee el índice.                |
+
+## Tests y evaluación
+
+```bash
+uv run pytest            # tests unitarios (chunking, coseno, rag mockeado)
+uv run python evals.py   # mide el "hit rate" de la recuperación con golden examples
+```
+
+Los tests no llaman a ninguna API (la generación se mockea), así que corren
+rápido y gratis. `evals.py` usa el modo léxico para correr offline.
 
 ## Estructura
 
 ```
 saber/
 ├── pyproject.toml          # metadatos, dependencias y el comando "saber"
+├── evals.py                # eval de recuperación (hit rate)
 ├── src/saber/
-│   ├── __init__.py
-│   ├── __main__.py         # punto de entrada
-│   ├── cli.py              # comandos (typer)
+│   ├── __main__.py         # punto de entrada (python -m saber)
+│   ├── cli.py              # comandos (typer) + flag --modo
 │   ├── docs.py             # cargar documentos y partir en chunks
-│   ├── index.py            # guardar y cargar el índice en disco
-│   ├── retrieve.py         # Protocol Retriever + impls lexical y semantico
-│   ├── llm.py              # cliente de la API de Claude (SDK anthropic)
-│   └── rag.py              # orquesta: recuperar → armar prompt → generar
-├── tests/
-│   └── data/docs/          # documentos de ejemplo para probar
-└── README.md
+│   ├── index.py            # guardar/cargar el índice (chunks y vectores)
+│   ├── retrieve.py         # Protocol Retriever + LexicalRetriever + SemanticRetriever
+│   ├── embeddings.py       # embeddings con Gemini (modo semántico)
+│   ├── llm.py              # generación con Gemini (SDK google-genai)
+│   └── rag.py              # orquesta: recuperar → armar contexto → generar
+└── tests/
+    ├── data/docs/          # documentos de ejemplo para probar
+    └── test_*.py           # pruebas con pytest
 ```
 
 La pieza central es el `Protocol` `Retriever`:
@@ -126,16 +134,21 @@ class Retriever(Protocol):
 ```
 
 Cambiar de búsqueda por palabras a búsqueda semántica es cambiar la
-implementación, no el resto del programa. Ese es el punto.
+**implementación**, no el resto del programa: `rag.py` no se entera. Ese es el punto.
+
+## Alcance honesto
+
+Es un proyecto de aprendizaje, no un sistema de producción. Lo que **sí** hace:
+indexar `.txt` y `.md`, recuperar por palabra (TF-IDF) o por embeddings, generar
+respuestas citadas sin alucinar, y medir la recuperación con un eval. Lo que
+**no** hace todavía (próximos pasos): PDFs, índice en base vectorial, re-ranking.
 
 ## Ideas para crecerlo
 
-- **Persistir en Postgres + `pgvector`:** conecta directo con el primer proyecto
-  (`turno`) y con el stack de Harmony. Reemplaza el índice en archivo por una
-  tabla con columna `vector`.
+- **Persistir en Postgres + `pgvector`:** reemplazar el índice en archivo por una
+  tabla con columna `vector`. Conecta con el stack de Harmony.
 - **Soporte de PDF** para manuales reales (`pypdf`).
+- **Búsqueda híbrida:** combinar léxico (exactitud en códigos/nombres) y semántico
+  (sinónimos) para lo mejor de ambos.
 - **Citas precisas:** que la respuesta señale documento y fragmento exacto.
-- **Evals:** un set de preguntas con respuesta esperada para medir si la
-  recuperación trae los chunks correctos (justo el "eval design" que el puesto
-  lista como "nice to have").
 - **Caché y control de latencia** en las llamadas a la API.

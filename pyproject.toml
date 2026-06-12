@@ -1,0 +1,53 @@
+# pyproject.toml — el "documento de identidad" del proyecto.
+# Aquí se declara cómo se llama, qué Python necesita, qué librerías usa
+# y qué comando de terminal expone. Es el estándar moderno de Python (PEP 621).
+
+[project]
+name = "saber"
+version = "0.1.0"
+description = "CLI que indexa documentos y responde preguntas citando las fuentes (RAG)."
+readme = "README.md"
+requires-python = ">=3.11"
+
+# Dependencias de la aplicación (lo que necesita para correr en producción).
+dependencies = [
+    "typer>=0.12",        # construir el CLI (comandos, flags, --help)
+    "google-genai>=1.0",  # SDK oficial de Google Gemini (generación) — Fase 3
+    "python-dotenv>=1.0", # leer la API key desde un archivo .env local
+    "voyageai>=0.3",      # SDK de embeddings (modo semántico) — se usa en la Fase 4
+    "numpy>=2.0",         # similitud de coseno — se usa en la Fase 4
+]
+
+# Esto define el comando de terminal `saber`. Al escribir `saber` en la consola,
+# Python importa el objeto `app` del módulo `saber.cli` y lo ejecuta.
+[project.scripts]
+saber = "saber.cli:app"
+
+# Dependencias SOLO de desarrollo (no se instalan en producción): pruebas,
+# linter/formateador y chequeo de tipos. Estándar PEP 735 que uv entiende.
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+# --- Configuración de las herramientas de calidad ---
+
+[tool.ruff]
+line-length = 88          # ancho máximo de línea (estilo Black)
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true             # chequeo de tipos estricto: nos obliga a tipar bien
+
+# --- Cómo se construye/instala el paquete ---
+# Usamos hatchling. Como el código vive en src/saber, se lo indicamos.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/saber"]

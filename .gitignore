@@ -1,6 +1,9 @@
 CLAUDE.md
+PLAN.md
+
 .env
 .venv
+.saber/
 __pycache__
 *.pyc
 *.pyo

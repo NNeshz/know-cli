@@ -1,6 +1,6 @@
 """Definición del CLI con typer: la app y sus tres subcomandos.
 
-El flag `--modo lexical|semantico` elige la implementación del Retriever. Fijate
+El flag `--modo lexical|semantico` elige la implementación del Retriever. Fíjate
 que `rag.py` no cambió nada al agregar el modo semántico: acá, en el "armador",
 es el único lugar que decide qué Retriever instanciar. Ese es el pago del Protocol.
 """
@@ -16,7 +16,7 @@ from know.index import cargar_indice, cargar_vectores, guardar_indice
 from know.rag import responder_pregunta
 from know.retrieve import LexicalRetriever, Retriever, SemanticRetriever
 
-# Carga las variables del archivo .env (p. ej. GEMINI_API_KEY) al entorno, si
+# Carga las variables del archivo .env (p. ej. ANTHROPIC_API_KEY) al entorno, si
 # existe. Así no dependemos de hacer `export` en cada terminal.
 load_dotenv()
 
@@ -41,12 +41,12 @@ def _construir_retriever(modo: str, chunks: list[Chunk], indice: Path) -> Retrie
         vectores = cargar_vectores(indice)
         if vectores is None:
             raise RuntimeError(
-                "El índice no tiene embeddings. Reindexá con: "
+                "El índice no tiene embeddings. Reindexa con: "
                 f"know indexar <carpeta> --indice {indice} --modo semantico"
             )
         return SemanticRetriever.desde_vectores(chunks, vectores)
     raise typer.BadParameter(
-        f"Modo desconocido: {modo!r}. Usá 'lexical' o 'semantico'."
+        f"Modo desconocido: {modo!r}. Usa 'lexical' o 'semantico'."
     )
 
 

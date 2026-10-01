@@ -1,8 +1,8 @@
 """Test de la orquestación RAG sin pegarle a ninguna API real.
 
-Mockeamos (fingimos) el Retriever y la función `responder`. Como `rag` solo
-conoce el contrato `Retriever`, le podemos pasar un doble de prueba que lo cumpla,
-y reemplazamos `responder` con `monkeypatch`. Así el test es rápido y gratis.
+Fingimos el Retriever y el Generador. Como `rag` solo conoce los contratos
+`Retriever` y `Generador`, le pasamos dobles de prueba que los cumplan. Así el test
+es rápido y gratis.
 """
 
 from know import rag
@@ -24,20 +24,29 @@ class RetrieverFalso:
         return self._chunks
 
 
-def test_responder_pregunta_recupera_y_genera(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    contexto_esperado = [Chunk("contenido relevante", "doc.md", 0)]
-    retriever = RetrieverFalso(contexto_esperado)
+class GeneradorFalso:
+    """Doble de prueba: cumple el contrato Generador y registra lo que recibe."""
 
-    # Reemplazamos `responder` (importado dentro de rag) por una versión falsa.
-    def responder_falso(
-        pregunta: str, contexto: list[Chunk], modelo: str | None = None
+    def __init__(self) -> None:
+        self.llamadas: list[tuple[str, list[Chunk], str | None]] = []
+
+    def responder(
+        self, pregunta: str, contexto: list[Chunk], modelo: str | None = None
     ) -> str:
+        self.llamadas.append((pregunta, contexto, modelo))
         return "respuesta de prueba"
 
-    monkeypatch.setattr(rag, "responder", responder_falso)
 
-    respuesta, contexto = rag.responder_pregunta("una pregunta", retriever, k=3)
+def test_responder_pregunta_recupera_y_genera() -> None:
+    contexto_esperado = [Chunk("contenido relevante", "doc.md", 0)]
+    retriever = RetrieverFalso(contexto_esperado)
+    generador = GeneradorFalso()
+
+    respuesta, contexto = rag.responder_pregunta(
+        "una pregunta", retriever, k=3, generador=generador
+    )
 
     assert respuesta == "respuesta de prueba"
     assert contexto == contexto_esperado
     assert retriever.consultas == ["una pregunta"]  # de verdad usó el retriever
+    assert generador.llamadas == [("una pregunta", contexto_esperado, None)]

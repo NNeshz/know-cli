@@ -12,7 +12,8 @@ requires-python = ">=3.11"
 # Dependencias de la aplicación (lo que necesita para correr en producción).
 dependencies = [
     "typer>=0.12",        # construir el CLI (comandos, flags, --help)
-    "google-genai>=1.0",  # SDK oficial de Google Gemini (generación y embeddings)
+    "anthropic>=1.0",     # SDK oficial de Anthropic (generación con Claude)
+    "google-genai>=1.0",  # SDK de Gemini (solo embeddings del modo semántico)
     "python-dotenv>=1.0", # leer la API key desde un archivo .env local
     "numpy>=2.0",         # similitud de coseno (modo semántico)
 ]

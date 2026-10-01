@@ -16,12 +16,15 @@ dependencies = [
     "google-genai>=1.0",  # SDK de Gemini (solo embeddings del modo semántico)
     "python-dotenv>=1.0", # leer la API key desde un archivo .env local
     "numpy>=2.0",         # similitud de coseno (modo semántico)
+    "mcp>=2.2.0",
 ]
 
 # Esto define el comando de terminal `know`. Al escribir `know` en la consola,
 # Python importa el objeto `app` del módulo `know.cli` y lo ejecuta.
 [project.scripts]
 know = "know.cli:app"
+# Servidor MCP por stdio (equivale a `know mcp`).
+know-mcp = "know.mcp_server:main"
 
 # Dependencias SOLO de desarrollo (no se instalan en producción): pruebas,
 # linter/formateador y chequeo de tipos. Estándar PEP 735 que uv entiende.

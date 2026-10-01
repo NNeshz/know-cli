@@ -1,5 +1,10 @@
 """Embeddings con Gemini para el modo semántico.
 
+Anthropic no ofrece un modelo de embeddings propio (recomienda Voyage AI), así que
+el modo semántico usa Gemini. Es lo ÚNICO que necesita GEMINI_API_KEY: el modo
+léxico y la generación con Claude funcionan solo con ANTHROPIC_API_KEY. Por eso el
+SDK de Gemini se importa de forma perezosa, solo cuando de verdad se embebe.
+
 Un *embedding* convierte un texto en un vector (lista de números) que captura su
 SIGNIFICADO. Textos parecidos en significado dan vectores cercanos. Usamos un
 `task_type` distinto al indexar (documentos) que al consultar (preguntas), porque
@@ -7,9 +12,6 @@ el modelo está entrenado para acercar una pregunta a su respuesta.
 """
 
 import os
-
-from google import genai
-from google.genai import types
 
 # Modelo de embeddings (gratuito en el free tier de Gemini). Se puede
 # sobreescribir con la variable de entorno KNOW_EMBEDDINGS_MODEL.
@@ -36,9 +38,14 @@ def embeber(textos: list[str], tipo: str) -> list[list[float]]:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "Falta la variable de entorno GEMINI_API_KEY. "
-            "Ponela en un archivo .env o expórtala en tu terminal."
+            "El modo semántico necesita la variable de entorno GEMINI_API_KEY "
+            "(Anthropic no tiene modelo de embeddings). Ponla en un archivo .env "
+            "o expórtala en tu terminal, o usa el modo léxico."
         )
+
+    # Import perezoso: solo el modo semántico necesita el SDK de Gemini.
+    from google import genai
+    from google.genai import types
 
     cliente = genai.Client(
         api_key=api_key,

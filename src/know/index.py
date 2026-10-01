@@ -33,7 +33,7 @@ def guardar_indice(
         with ruta_vectores.open("w", encoding="utf-8") as archivo:
             json.dump(vectores, archivo)
     elif ruta_vectores.exists():
-        # Si reindexás en modo léxico, borramos vectores viejos para no mezclar.
+        # Si reindexas en modo léxico, borramos vectores viejos para no mezclar.
         ruta_vectores.unlink()
 
 

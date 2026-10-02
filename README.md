@@ -5,7 +5,11 @@ CLI en Python que indexa una carpeta de documentos y responde preguntas en
 funciona como **servidor MCP**, para que Claude Desktop o Claude Code consulten tus
 documentos como una herramienta más.
 
-> **Demo en video:** (pendiente)
+## Demo
+
+<video src="assets/demo.mp4" controls width="100%"></video>
+
+[Ver el video de la demo](assets/demo.mp4)
 
 ## El problema
 

@@ -14,9 +14,9 @@ dependencies = [
     "typer>=0.12",        # construir el CLI (comandos, flags, --help)
     "anthropic>=1.0",     # SDK oficial de Anthropic (generación con Claude)
     "google-genai>=1.0",  # SDK de Gemini (solo embeddings del modo semántico)
+    "mcp>=2.0",           # SDK oficial de MCP (servidor para Claude Desktop/Code)
     "python-dotenv>=1.0", # leer la API key desde un archivo .env local
     "numpy>=2.0",         # similitud de coseno (modo semántico)
-    "mcp>=2.2.0",
 ]
 
 # Esto define el comando de terminal `know`. Al escribir `know` en la consola,

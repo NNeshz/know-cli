@@ -7,7 +7,7 @@ Define el contrato `Generador` (un Protocol, igual que `Retriever`) y su
 implementación con Claude. Así `rag.py` no depende del proveedor del modelo.
 
 El contexto recuperado y las reglas viven en el *system prompt*; en el mensaje del
-usuario va solo la pregunta. La instrucción anti-invención está acá: es lo que
+usuario va solo la pregunta. La instrucción anti-invención está aquí: es lo que
 evita que el modelo alucine.
 """
 
@@ -67,7 +67,7 @@ class ClaudeGenerador:
 
     El cliente se puede inyectar (útil para pruebas, sin llamadas reales). Si no se
     pasa, se crea uno con la API key de ANTHROPIC_API_KEY. El SDK ya reintenta con
-    backoff los errores transitorios (429, 5xx), así que no se repite acá.
+    backoff los errores transitorios (429, 5xx), así que no se repite aquí.
     """
 
     def __init__(self, cliente: anthropic.Anthropic | None = None) -> None:

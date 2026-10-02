@@ -667,7 +667,7 @@ dev = [
 requires-dist = [
     { name = "anthropic", specifier = ">=1.0" },
     { name = "google-genai", specifier = ">=1.0" },
-    { name = "mcp", specifier = ">=2.2.0" },
+    { name = "mcp", specifier = ">=2.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "python-dotenv", specifier = ">=1.0" },
     { name = "typer", specifier = ">=0.12" },

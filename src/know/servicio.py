@@ -2,7 +2,7 @@
 
 Tanto `cli.py` (typer) como `mcp_server.py` (herramientas MCP) son solo "puertas de
 entrada": reciben parámetros, llaman a estas funciones y presentan el resultado a su
-manera. La lógica vive acá, una sola vez.
+manera. La lógica vive aquí, una sola vez.
 """
 
 from pathlib import Path
@@ -42,7 +42,7 @@ def indexar_carpeta(carpeta: Path, indice: Path, modo: str = "lexical") -> int:
     """Lee los documentos de `carpeta`, los parte en chunks y guarda el índice.
 
     Devuelve cuántos chunks se indexaron. En modo semántico calcula los embeddings
-    UNA vez (acá) y los guarda junto con los chunks.
+    UNA vez (aquí) y los guarda junto con los chunks.
     """
     if modo not in MODOS:
         raise ValueError(f"Modo desconocido: {modo!r}. Usa 'lexical' o 'semantico'.")

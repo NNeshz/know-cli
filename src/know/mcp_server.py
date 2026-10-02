@@ -3,7 +3,7 @@
 MCP (Model Context Protocol) es el estándar para que un cliente como Claude Desktop
 o Claude Code use herramientas externas. Este servidor habla por stdio: el cliente lo
 lanza como proceso hijo y se comunican por stdin/stdout. Por eso NUNCA se debe
-imprimir nada en stdout acá (rompería el protocolo); los logs van a stderr.
+imprimir nada en stdout aquí (rompería el protocolo); los logs van a stderr.
 
 Las herramientas son funciones normales (se pueden llamar directo en los tests) y
 solo delegan en `servicio.py`: no se duplica ninguna lógica del CLI.
